@@ -17,7 +17,7 @@ const crimson = Crimson_Pro({
 
 export const metadata: Metadata = {
   title: "Do You Know Jesus? | Easter Quiz",
-  description: "An Easter quiz with saved submissions and an admin dashboard.",
+  description: "Test your knowledge of the Easter story with twenty thoughtful questions.",
 };
 
 export default function RootLayout({

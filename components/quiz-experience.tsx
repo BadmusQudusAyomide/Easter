@@ -29,6 +29,7 @@ export function QuizExperience({ questions }: QuizExperienceProps) {
     () => Array.from({ length: shuffledQuestions.length }, () => -1),
   );
   const [revealedAnswer, setRevealedAnswer] = useState<number | null>(null);
+  const [showGreeting, setShowGreeting] = useState(false);
   const hasSubmittedRef = useRef(false);
   const resultCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -125,6 +126,7 @@ export function QuizExperience({ questions }: QuizExperienceProps) {
 
   function nextQuestion() {
     if (currentIndex === total - 1) {
+      setShowGreeting(true);
       setScreen("result");
       return;
     }
@@ -140,6 +142,7 @@ export function QuizExperience({ questions }: QuizExperienceProps) {
     setScore(0);
     setSelectedAnswers(Array.from({ length: shuffledQuestions.length }, () => -1));
     setRevealedAnswer(null);
+    setShowGreeting(false);
     hasSubmittedRef.current = false;
   }
 
@@ -390,6 +393,27 @@ export function QuizExperience({ questions }: QuizExperienceProps) {
           </section>
         ) : null}
       </div>
+
+      {screen === "result" && showGreeting ? (
+        <div className="absolute inset-0 z-30 flex items-center justify-center bg-[rgba(8,5,2,0.74)] px-4 backdrop-blur-sm">
+          <div className="w-full max-w-lg rounded-[1.75rem] border border-[rgba(201,168,76,0.22)] bg-[rgba(20,12,6,0.95)] p-6 text-center shadow-[0_20px_80px_rgba(0,0,0,0.55)] sm:p-8">
+            <p className="text-4xl text-[var(--gold-light)]">Happy Easter</p>
+            <h3 className="mt-4 font-[family:var(--font-cinzel)] text-2xl text-[var(--gold-light)] sm:text-3xl">
+              {getEasterGreeting(score, total).title}
+            </h3>
+            <p className="mt-4 text-base leading-7 text-[rgba(245,239,224,0.82)] sm:text-lg sm:leading-8">
+              {getEasterGreeting(score, total).message}
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowGreeting(false)}
+              className="mt-6 rounded-full bg-[linear-gradient(135deg,var(--gold)_0%,var(--gold-light)_50%,var(--gold)_100%)] px-6 py-3 font-[family:var(--font-cinzel)] text-sm tracking-[0.25em] text-[var(--dark)] transition hover:-translate-y-0.5"
+            >
+              CONTINUE
+            </button>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }
@@ -470,6 +494,40 @@ function getResultData(score: number, total: number) {
     title: "We Need to Talk",
     message:
       "There is room to grow here. The good news is the story is still waiting for you, and now your attempt can be saved too.",
+  };
+}
+
+function getEasterGreeting(score: number, total: number) {
+  const pct = Math.round((score / total) * 100);
+
+  if (pct >= 90) {
+    return {
+      title: "Heaven-Level Performance",
+      message:
+        "You really showed up for this one. Beautiful score, beautiful effort, and above all, Happy Easter.",
+    };
+  }
+
+  if (pct >= 70) {
+    return {
+      title: "A Strong Easter Showing",
+      message:
+        "You know the story well and that is no small thing. A few details slipped, but still, Happy Easter and well done.",
+    };
+  }
+
+  if (pct >= 50) {
+    return {
+      title: "Not Bad at All",
+      message:
+        "You caught a good part of it, and missed a few too. That is alright. Happy Easter, and may the story stay with you.",
+    };
+  }
+
+  return {
+    title: "A Little Revision Never Hurt",
+    message:
+      "Well, you missed quite a bit, but that just means there is more to discover. Happy Easter, and thank you for playing.",
   };
 }
 

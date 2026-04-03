@@ -205,17 +205,28 @@ function SummaryCard({ label, value }: { label: string; value: string }) {
 
 function formatAnswers(answers: SubmissionRecord["answers"]) {
   if (Array.isArray(answers)) {
-    return answers.join(", ");
+    return formatAnswerList(answers);
   }
 
   if (typeof answers === "string") {
     try {
       const parsed = JSON.parse(answers);
-      return Array.isArray(parsed) ? parsed.join(", ") : "Saved";
+      return Array.isArray(parsed) ? formatAnswerList(parsed) : "Saved";
     } catch {
       return answers;
     }
   }
 
   return "Saved";
+}
+
+function formatAnswerList(answers: number[]) {
+  const letters = ["A", "B", "C", "D"];
+
+  return answers
+    .map((answer, index) => {
+      const label = letters[answer] ?? "-";
+      return `Q${index + 1}: ${label}`;
+    })
+    .join(", ");
 }

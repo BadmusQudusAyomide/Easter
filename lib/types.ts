@@ -6,6 +6,10 @@ export type QuizQuestion = {
   explanation: string;
 };
 
+export type ShuffledQuizQuestion = QuizQuestion & {
+  optionOrder: number[];
+};
+
 export type QuizSubmissionPayload = {
   name: string;
   score: number;

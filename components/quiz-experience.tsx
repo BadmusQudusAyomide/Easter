@@ -2,7 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import type { QuizQuestion, QuizSubmissionPayload } from "@/lib/types";
+import type {
+  QuizQuestion,
+  QuizSubmissionPayload,
+  ShuffledQuizQuestion,
+} from "@/lib/types";
 
 type QuizExperienceProps = {
   questions: QuizQuestion[];
@@ -11,6 +15,10 @@ type QuizExperienceProps = {
 const optionLetters = ["A", "B", "C", "D"];
 
 export function QuizExperience({ questions }: QuizExperienceProps) {
+  const shuffledQuestions = useMemo(
+    () => questions.map((question) => shuffleQuestion(question)),
+    [questions],
+  );
   const total = questions.length;
   const [screen, setScreen] = useState<"intro" | "quiz" | "result">("intro");
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -18,12 +26,12 @@ export function QuizExperience({ questions }: QuizExperienceProps) {
   const [playerName, setPlayerName] = useState("");
   const [draftName, setDraftName] = useState("");
   const [selectedAnswers, setSelectedAnswers] = useState<number[]>(
-    () => Array.from({ length: questions.length }, () => -1),
+    () => Array.from({ length: shuffledQuestions.length }, () => -1),
   );
   const [revealedAnswer, setRevealedAnswer] = useState<number | null>(null);
   const hasSubmittedRef = useRef(false);
 
-  const currentQuestion = questions[currentIndex];
+  const currentQuestion = shuffledQuestions[currentIndex];
   const progress = (currentIndex / total) * 100;
   const percentage = Math.round((score / total) * 100);
   const hasName = draftName.trim().length > 0;
@@ -70,7 +78,7 @@ export function QuizExperience({ questions }: QuizExperienceProps) {
     setPlayerName(trimmedName);
     setCurrentIndex(0);
     setScore(0);
-    setSelectedAnswers(Array.from({ length: questions.length }, () => -1));
+    setSelectedAnswers(Array.from({ length: shuffledQuestions.length }, () => -1));
     setRevealedAnswer(null);
     setScreen("quiz");
     hasSubmittedRef.current = false;
@@ -108,7 +116,7 @@ export function QuizExperience({ questions }: QuizExperienceProps) {
     setScreen("intro");
     setCurrentIndex(0);
     setScore(0);
-    setSelectedAnswers(Array.from({ length: questions.length }, () => -1));
+    setSelectedAnswers(Array.from({ length: shuffledQuestions.length }, () => -1));
     setRevealedAnswer(null);
     hasSubmittedRef.current = false;
   }
@@ -341,6 +349,25 @@ function Stat({ value, label }: { value: string; label: string }) {
       </p>
     </div>
   );
+}
+
+function shuffleQuestion(question: QuizQuestion): ShuffledQuizQuestion {
+  const optionOrder = question.options.map((_, index) => index);
+
+  for (let index = optionOrder.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [optionOrder[index], optionOrder[randomIndex]] = [
+      optionOrder[randomIndex],
+      optionOrder[index],
+    ];
+  }
+
+  return {
+    ...question,
+    options: optionOrder.map((index) => question.options[index]),
+    answer: optionOrder.indexOf(question.answer),
+    optionOrder,
+  };
 }
 
 function getResultData(score: number, total: number) {

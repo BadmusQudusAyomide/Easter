@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Do You Know Jesus? – Easter Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-dim: #7a5f28;
+    --cream: #f5efe0;
+    --dark: #1a1208;
+    --mid: #2e2010;
+    --text: #3b2a0e;
+    --correct: #3d8c40;
+    --wrong: #a63228;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background-color: var(--dark);
+    min-height: 100vh;
+    font-family: 'Crimson Pro', serif;
+    color: var(--cream);
+    overflow-x: hidden;
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.15) 0%, transparent 60%),
+      repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(201,168,76,0.03) 60px, rgba(201,168,76,0.03) 61px),
+      repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(201,168,76,0.03) 60px, rgba(201,168,76,0.03) 61px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+  }
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeUp 0.6s ease both; }
+
+  /* ── INTRO ── */
+  #intro { text-align: center; }
+  .cross-icon {
+    font-size: 56px;
+    margin-bottom: 8px;
+    display: block;
+    animation: glow 3s ease-in-out infinite;
+  }
+  @keyframes glow {
+    0%,100% { filter: drop-shadow(0 0 10px rgba(201,168,76,0.4)); }
+    50% { filter: drop-shadow(0 0 30px rgba(201,168,76,0.9)); }
+  }
+  .subtitle-tag {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(26px, 7vw, 50px);
+    font-weight: 900;
+    line-height: 1.1;
+    color: var(--gold-light);
+    text-shadow: 0 2px 30px rgba(201,168,76,0.4);
+    margin-bottom: 12px;
+  }
+  .intro-desc {
+    font-size: 18px;
+    font-style: italic;
+    color: rgba(245,239,224,0.75);
+    line-height: 1.6;
+    max-width: 480px;
+    margin: 0 auto 28px;
+  }
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 32px;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--gold);
+    display: block;
+  }
+  .stat-label {
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: rgba(245,239,224,0.5);
+    text-transform: uppercase;
+  }
+  .divider { width: 1px; background: rgba(201,168,76,0.3); align-self: stretch; }
+
+  /* Name input */
+  .name-wrap {
+    max-width: 360px;
+    margin: 0 auto 24px;
+    text-align: left;
+  }
+  .name-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .name-input {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(201,168,76,0.3);
+    color: var(--cream);
+    padding: 14px 16px;
+    font-family: 'Crimson Pro', serif;
+    font-size: 17px;
+    border-radius: 3px;
+    outline: none;
+    transition: border-color 0.25s;
+  }
+  .name-input::placeholder { color: rgba(245,239,224,0.25); font-style: italic; }
+  .name-input:focus { border-color: var(--gold); }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold) 100%);
+    color: var(--dark);
+    border: none;
+    padding: 16px 48px;
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 24px rgba(201,168,76,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    top: -50%; left: -60%;
+    width: 40%; height: 200%;
+    background: rgba(255,255,255,0.15);
+    transform: skewX(-20deg);
+    transition: left 0.5s ease;
+  }
+  .btn-primary:hover::after { left: 120%; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(201,168,76,0.5); }
+  .btn-primary:active { transform: translateY(0); }
+  .intro-note {
+    margin-top: 18px;
+    font-size: 13px;
+    font-style: italic;
+    color: rgba(245,239,224,0.3);
+  }
+
+  /* ── QUIZ ── */
+  .progress-wrap { margin-bottom: 28px; }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .q-counter {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+  .score-display { font-family: 'Cinzel', serif; font-size: 13px; color: rgba(245,239,224,0.6); }
+  .score-display span { color: var(--gold); font-weight: 600; }
+  .progress-bar { height: 3px; background: rgba(201,168,76,0.15); border-radius: 2px; overflow: hidden; }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+  .question-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 4px;
+    padding: 28px 24px 24px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .question-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: linear-gradient(180deg, var(--gold), transparent);
+    border-radius: 4px 0 0 4px;
+  }
+  .verse-ref {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 10px;
+  }
+  .question-text {
+    font-size: clamp(16px, 3vw, 21px);
+    line-height: 1.5;
+    color: var(--cream);
+    font-weight: 300;
+  }
+  .options-grid { display: grid; gap: 9px; margin-bottom: 16px; }
+  .option-btn {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(201,168,76,0.18);
+    color: var(--cream);
+    padding: 13px 18px;
+    text-align: left;
+    font-family: 'Crimson Pro', serif;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .option-letter {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gold-dim);
+    min-width: 18px;
+    transition: color 0.2s;
+  }
+  .option-btn:hover:not(:disabled) { background: rgba(201,168,76,0.08); border-color: rgba(201,168,76,0.4); transform: translateX(3px); }
+  .option-btn:hover:not(:disabled) .option-letter { color: var(--gold); }
+  .option-btn.correct { background: rgba(61,140,64,0.15); border-color: #3d8c40; color: #a8e6aa; }
+  .option-btn.correct .option-letter { color: #3d8c40; }
+  .option-btn.wrong { background: rgba(166,50,40,0.15); border-color: #a63228; color: #f5a9a5; }
+  .option-btn.wrong .option-letter { color: #a63228; }
+  .option-btn.dimmed { opacity: 0.3; }
+  .option-btn:disabled { cursor: default; }
+
+  .explanation {
+    display: none;
+    border-radius: 3px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+  }
+  .explanation.show { display: block; animation: slideDown 0.4s ease both; }
+  .explanation.correct-exp { background: rgba(61,140,64,0.1); border: 1px solid rgba(61,140,64,0.3); }
+  .explanation.wrong-exp { background: rgba(166,50,40,0.1); border: 1px solid rgba(166,50,40,0.3); }
+  .exp-header {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .correct-exp .exp-header { color: #3d8c40; }
+  .wrong-exp .exp-header { color: #c0544e; }
+  .exp-text { font-size: 14px; line-height: 1.65; color: rgba(245,239,224,0.8); font-style: italic; }
+
+  .next-btn {
+    display: none;
+    width: 100%;
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.35);
+    color: var(--gold);
+    padding: 13px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.25s ease;
+    text-transform: uppercase;
+  }
+  .next-btn.show { display: block; }
+  .next-btn:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); }
+
+  /* ── RESULT ── */
+  #result { text-align: center; }
+  .result-cross { font-size: 44px; display: block; margin-bottom: 12px; }
+  .result-name {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .result-grade {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(52px, 14vw, 88px);
+    font-weight: 900;
+    color: var(--gold);
+    text-shadow: 0 0 40px rgba(201,168,76,0.5);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .result-total {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    color: rgba(245,239,224,0.45);
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+  }
+  .result-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(18px, 5vw, 28px);
+    color: var(--gold-light);
+    margin-bottom: 10px;
+  }
+  .result-message {
+    font-size: 17px;
+    font-style: italic;
+    color: rgba(245,239,224,0.65);
+    max-width: 440px;
+    margin: 0 auto 32px;
+    line-height: 1.6;
+  }
+
+  /* Share card */
+  .share-section {
+    margin-bottom: 28px;
+  }
+  .share-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  #share-canvas {
+    border-radius: 6px;
+    max-width: 100%;
+    display: block;
+    margin: 0 auto 14px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+  }
+  .share-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.4);
+    color: var(--gold);
+    padding: 12px 28px;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.25s ease;
+    text-transform: uppercase;
+  }
+  .btn-secondary:hover { background: rgba(201,168,76,0.08); border-color: var(--gold); }
+
+  .result-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--dark); }
+  ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- INTRO -->
+  <div id="intro" class="screen active">
+    <span class="cross-icon">✝</span>
+    <p class="subtitle-tag">Easter 2025 · Special Edition</p>
+    <h1>How Well Do You<br>Know Jesus?</h1>
+    <p class="intro-desc">You call yourself a Christian — but can you answer these? 20 questions on the life, death, and resurrection of Jesus Christ.</p>
+    <div class="stats-row">
+      <div class="stat">
+        <span class="stat-num">20</span>
+        <span class="stat-label">Questions</span>
+      </div>
+      <div class="divider"></div>
+      <div class="stat">
+        <span class="stat-num">4</span>
+        <span class="stat-label">Options Each</span>
+      </div>
+      <div class="divider"></div>
+      <div class="stat">
+        <span class="stat-num">∞</span>
+        <span class="stat-label">Replays</span>
+      </div>
+    </div>
+    <div class="name-wrap">
+      <label class="name-label" for="player-name">Your Name</label>
+      <input class="name-input" type="text" id="player-name" placeholder="Enter your name to begin..." maxlength="30" />
+    </div>
+    <button class="btn-primary" onclick="startQuiz()">BEGIN THE QUIZ</button>
+    <p class="intro-note">Built with love (and curiosity) by a non-believer 😇</p>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz" class="screen">
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span class="q-counter" id="q-counter">Question 1 of 20</span>
+        <span class="score-display">Score: <span id="score-num">0</span></span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="question-card">
+      <p class="verse-ref" id="verse-ref"></p>
+      <p class="question-text" id="question-text"></p>
+    </div>
+    <div class="options-grid" id="options-grid"></div>
+    <div class="explanation" id="explanation">
+      <p class="exp-header" id="exp-header"></p>
+      <p class="exp-text" id="exp-text"></p>
+    </div>
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next Question →</button>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result" class="screen">
+    <span class="result-cross">✝</span>
+    <p class="result-name" id="result-name"></p>
+    <div class="result-grade" id="result-grade"></div>
+    <p class="result-total" id="result-total"></p>
+    <h2 class="result-title" id="result-title"></h2>
+    <p class="result-message" id="result-message"></p>
+
+    <div class="share-section">
+      <p class="share-label">📸 Share Your Result</p>
+      <canvas id="share-canvas" width="600" height="340"></canvas>
+      <div class="share-buttons">
+        <button class="btn-primary" onclick="downloadCard()">⬇ Download Card</button>
+        <button class="btn-secondary" onclick="copyShareText()">📋 Copy Text</button>
+      </div>
+    </div>
+
+    <div class="result-actions">
+      <button class="btn-secondary" onclick="startQuiz()">PLAY AGAIN</button>
+      <button class="btn-secondary" onclick="showScreen('intro')">HOME</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    ref: "Matthew 1:21",
+    question: "What does the name 'Jesus' mean?",
+    options: ["Son of God", "He will save his people from their sins", "King of the Jews", "Light of the world"],
+    answer: 1,
+    explanation: "The angel told Joseph: 'You shall call his name Jesus, for he will save his people from their sins.' The name Jesus (Yeshua in Hebrew) literally means 'God saves' — his very name was his mission statement."
+  },
+  {
+    ref: "Luke 2:4–7",
+    question: "In which city was Jesus born?",
+    options: ["Jerusalem", "Nazareth", "Bethlehem", "Capernaum"],
+    answer: 2,
+    explanation: "Jesus was born in Bethlehem, the city of David, because Joseph had to register for a Roman census there. This fulfilled the prophecy in Micah 5:2, written over 700 years earlier."
+  },
+  {
+    ref: "Matthew 2:1–2",
+    question: "Who came from the East following a star to find Jesus after his birth?",
+    options: ["Shepherds", "Angels", "Wise Men (Magi)", "Priests"],
+    answer: 2,
+    explanation: "The Magi (often called the Three Wise Men) came from the East following a star. Interestingly, the Bible never says there were exactly three — that assumption comes from the three gifts: gold, frankincense, and myrrh."
+  },
+  {
+    ref: "Matthew 3:13–17",
+    question: "Who baptized Jesus?",
+    options: ["Peter", "John the Baptist", "Elijah", "Moses"],
+    answer: 1,
+    explanation: "John the Baptist baptized Jesus in the Jordan River. At that moment, the Spirit descended like a dove and a voice said: 'This is my beloved Son, in whom I am well pleased.' A powerful scene still referenced today."
+  },
+  {
+    ref: "Matthew 4:1–2",
+    question: "How long did Jesus fast in the wilderness before being tempted by Satan?",
+    options: ["7 days", "21 days", "40 days", "3 months"],
+    answer: 2,
+    explanation: "Jesus fasted for 40 days and 40 nights in the wilderness. The number 40 is highly significant in the Bible — Moses also fasted 40 days, and the Israelites wandered 40 years. After the fast, Satan came to tempt him three times."
+  },
+  {
+    ref: "John 2:1–11",
+    question: "What was Jesus's first recorded miracle?",
+    options: ["Healing a blind man", "Feeding 5,000 people", "Turning water into wine", "Walking on water"],
+    answer: 2,
+    explanation: "Jesus's first miracle was turning water into wine at a wedding in Cana — at his mother Mary's request. He turned six stone jars of water (about 180 gallons!) into wine. The master of the banquet called it the best wine served."
+  },
+  {
+    ref: "Matthew 14:15–21",
+    question: "How many people did Jesus feed with just 5 loaves of bread and 2 fish?",
+    options: ["2,000", "3,000", "5,000", "10,000"],
+    answer: 2,
+    explanation: "Jesus fed 5,000 men — not counting women and children, so the actual crowd was likely far larger. After everyone ate and was satisfied, the disciples collected 12 basketfuls of leftovers. This miracle appears in all four gospels."
+  },
+  {
+    ref: "Luke 22:3–6",
+    question: "How much silver did Judas receive for betraying Jesus?",
+    options: ["10 pieces", "20 pieces", "30 pieces", "50 pieces"],
+    answer: 2,
+    explanation: "Judas agreed to betray Jesus for 30 pieces of silver — the same price as a slave under Mosaic law. This too fulfilled a prophecy from Zechariah 11:12–13. Judas later threw the money back in the temple and hanged himself."
+  },
+  {
+    ref: "Luke 22:19–20",
+    question: "What event did Jesus establish on the night before his death?",
+    options: ["Water baptism", "The Lord's Supper (Communion)", "The Feast of Passover", "The Sabbath"],
+    answer: 1,
+    explanation: "On the night before his crucifixion, Jesus shared what became known as The Last Supper with his disciples. He broke bread saying 'this is my body' and shared wine saying 'this is my blood of the covenant' — establishing the practice of Communion."
+  },
+  {
+    ref: "John 18:28–40",
+    question: "Who was the Roman governor that sentenced Jesus to death?",
+    options: ["Caesar", "Herod", "Pontius Pilate", "Caiaphas"],
+    answer: 2,
+    explanation: "Pontius Pilate, the Roman prefect of Judea, sentenced Jesus to death. He found no fault in Jesus and even tried to release him — but the crowd demanded crucifixion. He famously washed his hands to declare his own innocence."
+  },
+  {
+    ref: "John 19:17–19",
+    question: "What was written on the sign placed above Jesus on the cross?",
+    options: ["King of the Jews", "Son of God", "Jesus of Nazareth", "INRI — Jesus of Nazareth, King of the Jews"],
+    answer: 3,
+    explanation: "The full inscription was 'Jesus of Nazareth, King of the Jews' written in Hebrew, Latin, and Greek. In Latin: Iesus Nazarenus Rex Iudaeorum — abbreviated as INRI. The Jewish leaders protested, but Pilate replied: 'What I have written, I have written.'"
+  },
+  {
+    ref: "Luke 23:32–43",
+    question: "How many criminals were crucified alongside Jesus?",
+    options: ["One", "Two", "Three", "Four"],
+    answer: 1,
+    explanation: "Two criminals were crucified — one on each side. One mocked Jesus; the other defended him and asked: 'Remember me when you come into your kingdom.' Jesus replied: 'Today you will be with me in Paradise.' He is known as the penitent thief."
+  },
+  {
+    ref: "Matthew 27:45",
+    question: "For how many hours did darkness cover the land while Jesus was on the cross?",
+    options: ["One hour", "Two hours", "Three hours", "Six hours"],
+    answer: 2,
+    explanation: "From the sixth to the ninth hour (noon to 3 PM), darkness covered the whole land. This was during the final hours of Jesus on the cross and is recorded in Matthew, Mark, and Luke — all three synoptic gospels."
+  },
+  {
+    ref: "John 19:34",
+    question: "What two things flowed from Jesus's side when pierced by a soldier's spear?",
+    options: ["Water and fire", "Blood and water", "Oil and blood", "Tears and blood"],
+    answer: 1,
+    explanation: "When a soldier pierced Jesus's side to confirm death, blood and water immediately flowed out. Theologically, many see this as deeply symbolic — representing the sacraments of communion (blood) and baptism (water)."
+  },
+  {
+    ref: "Matthew 27:57–60",
+    question: "Who asked Pilate for Jesus's body and placed it in the tomb?",
+    options: ["Peter", "Mary Magdalene", "Joseph of Arimathea", "John the apostle"],
+    answer: 2,
+    explanation: "Joseph of Arimathea, a wealthy secret disciple, boldly asked Pilate for Jesus's body. He wrapped it in clean linen and laid it in his own brand-new tomb. Nicodemus also brought about 75 pounds of burial spices (John 19:39)."
+  },
+  {
+    ref: "Matthew 27:62–66",
+    question: "Why did the chief priests seal and guard Jesus's tomb?",
+    options: ["To protect the body from animals", "To prevent disciples from stealing the body", "To honor Jewish burial customs", "Roman law required it"],
+    answer: 1,
+    explanation: "The chief priests remembered Jesus's words about rising in three days. They feared the disciples would steal the body and claim resurrection. So they secured the tomb with a seal and guards — but it made no difference come Sunday morning."
+  },
+  {
+    ref: "John 20:1–2",
+    question: "Who was the first person to discover the empty tomb on Sunday morning?",
+    options: ["Peter", "John", "Mary Magdalene", "Salome"],
+    answer: 2,
+    explanation: "Mary Magdalene arrived at the tomb early Sunday morning and found the stone rolled away. She ran to tell Peter and John: 'They have taken the Lord out of the tomb, and we don't know where they have put him!' She was the first witness to the empty tomb."
+  },
+  {
+    ref: "John 20:19–20",
+    question: "How did Jesus first appear to his disciples after the resurrection?",
+    options: ["He knocked on the door", "He walked through locked doors", "He appeared in a dream", "He called them from outside"],
+    answer: 1,
+    explanation: "The disciples were hiding behind locked doors in fear when Jesus suddenly appeared in the room — passing right through the walls. He showed them his hands and side as proof. They were filled with joy when they recognized the Lord."
+  },
+  {
+    ref: "John 20:24–29",
+    question: "Which disciple refused to believe in the resurrection without physically touching Jesus's wounds?",
+    options: ["Peter", "Philip", "Thomas", "Andrew"],
+    answer: 2,
+    explanation: "Thomas said he wouldn't believe unless he personally touched the nail marks and the wound in Jesus's side. When Jesus appeared again and offered exactly that, Thomas declared: 'My Lord and my God!' Jesus said: 'Blessed are those who have not seen and yet have believed.'"
+  },
+  {
+    ref: "Acts 1:3, 9–11",
+    question: "How many days after the resurrection did Jesus ascend to heaven?",
+    options: ["3 days", "7 days", "40 days", "50 days"],
+    answer: 2,
+    explanation: "Jesus appeared to his disciples for 40 days after his resurrection, teaching about the kingdom of God. He then ascended to heaven from the Mount of Olives in a cloud. Two angels told the disciples he would return the same way he left."
+  }
+];
+
+let currentQ = 0;
+let score = 0;
+let answered = false;
+let playerName = '';
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function startQuiz() {
+  const nameInput = document.getElementById('player-name').value.trim();
+  playerName = nameInput || 'Player';
+  currentQ = 0;
+  score = 0;
+  showScreen('quiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = QUESTIONS[currentQ];
+  const total = QUESTIONS.length;
+
+  document.getElementById('q-counter').textContent = `Question ${currentQ + 1} of ${total}`;
+  document.getElementById('score-num').textContent = score;
+  document.getElementById('progress-fill').style.width = `${(currentQ / total) * 100}%`;
+  document.getElementById('verse-ref').textContent = q.ref;
+  document.getElementById('question-text').textContent = q.question;
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="option-letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i);
+    grid.appendChild(btn);
+  });
+
+  const exp = document.getElementById('explanation');
+  exp.className = 'explanation';
+  document.getElementById('next-btn').classList.remove('show');
+  document.getElementById('next-btn').textContent = currentQ < QUESTIONS.length - 1 ? 'Next Question →' : 'See My Results →';
+}
+
+function selectAnswer(selected) {
+  if (answered) return;
+  answered = true;
+  const q = QUESTIONS[currentQ];
+  const btns = document.querySelectorAll('.option-btn');
+  const isCorrect = selected === q.answer;
+  if (isCorrect) score++;
+
+  btns.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.answer) btn.classList.add('correct');
+    else if (i === selected) btn.classList.add('wrong');
+    else btn.classList.add('dimmed');
+  });
+
+  const exp = document.getElementById('explanation');
+  exp.className = `explanation show ${isCorrect ? 'correct-exp' : 'wrong-exp'}`;
+  document.getElementById('exp-header').textContent = isCorrect ? '✓ Correct!' : '✗ Not quite...';
+  document.getElementById('exp-text').textContent = q.explanation;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= QUESTIONS.length) showResult();
+  else renderQuestion();
+}
+
+function getResultData(sc, total) {
+  const pct = Math.round((sc / total) * 100);
+  let title, message, emoji;
+  if (pct === 100) {
+    title = "You Are The Word 🔥"; emoji = "👑";
+    message = "Perfect score. Either you went to seminary or you read your Bible every day. Genuinely impressive — Jesus would be proud.";
+  } else if (pct >= 80) {
+    title = "Faithful & Knowledgeable"; emoji = "🙌";
+    message = "You know your scriptures well. A few gaps here and there, but your foundation is solid. Go revisit the ones you missed.";
+  } else if (pct >= 60) {
+    title = "Sunday School Graduate"; emoji = "📖";
+    message = "You know the main story but the details tripped you up. Maybe dust off that Bible this Easter season? 😄";
+  } else if (pct >= 40) {
+    title = "Casual Believer"; emoji = "🤔";
+    message = "You know Jesus exists and the basics — but the depth isn't quite there. No judgment. The Easter story is worth a full read.";
+  } else {
+    title = "... We Need to Talk 😅"; emoji = "😬";
+    message = "This quiz was built by a non-Christian and even I knew most of these answers. Less TikTok, more Luke this Easter? 😂";
+  }
+  return { pct, title, message, emoji };
+}
+
+function showResult() {
+  showScreen('result');
+  const total = QUESTIONS.length;
+  const { pct, title, message } = getResultData(score, total);
+
+  document.getElementById('result-name').textContent = playerName.toUpperCase();
+  document.getElementById('result-grade').textContent = `${score}/${total}`;
+  document.getElementById('result-total').textContent = `${pct}% Correct`;
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-message').textContent = message;
+
+  setTimeout(() => drawShareCard(), 300);
+}
+
+function drawShareCard() {
+  const canvas = document.getElementById('share-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = 600, H = 340;
+  canvas.width = W; canvas.height = H;
+
+  const total = QUESTIONS.length;
+  const { pct, title, emoji } = getResultData(score, total);
+
+  // Background
+  ctx.fillStyle = '#1a1208';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(201,168,76,0.04)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < W; x += 50) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for (let y = 0; y < H; y += 50) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+  // Gold glow top
+  const grd = ctx.createRadialGradient(W/2, 0, 0, W/2, 0, 300);
+  grd.addColorStop(0, 'rgba(201,168,76,0.18)');
+  grd.addColorStop(1, 'transparent');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, W, H);
+
+  // Border
+  ctx.strokeStyle = 'rgba(201,168,76,0.35)';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(16, 16, W - 32, H - 32);
+
+  // Corner accents
+  const corner = (x, y, dx, dy) => {
+    ctx.beginPath();
+    ctx.moveTo(x, y + dy * 20); ctx.lineTo(x, y); ctx.lineTo(x + dx * 20, y);
+    ctx.strokeStyle = 'rgba(201,168,76,0.7)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  };
+  corner(16, 16, 1, 1); corner(W-16, 16, -1, 1);
+  corner(16, H-16, 1, -1); corner(W-16, H-16, -1, -1);
+
+  // Cross
+  ctx.font = '28px serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('✝', W/2, 62);
+
+  // Title tag
+  ctx.font = '600 10px Cinzel, serif';
+  ctx.fillStyle = 'rgba(201,168,76,0.5)';
+  ctx.letterSpacing = '3px';
+  ctx.fillText('EASTER 2025 · JESUS QUIZ', W/2, 86);
+
+  // Player name
+  ctx.font = 'bold 15px Cinzel, serif';
+  ctx.fillStyle = 'rgba(245,239,224,0.6)';
+  ctx.fillText(playerName.toUpperCase(), W/2, 116);
+
+  // Score
+  ctx.font = 'bold 72px Cinzel, serif';
+  ctx.fillStyle = '#c9a84c';
+  ctx.shadowColor = 'rgba(201,168,76,0.5)';
+  ctx.shadowBlur = 20;
+  ctx.fillText(`${score}/${total}`, W/2, 198);
+  ctx.shadowBlur = 0;
+
+  // Pct
+  ctx.font = '13px Cinzel, serif';
+  ctx.fillStyle = 'rgba(245,239,224,0.4)';
+  ctx.fillText(`${pct}% CORRECT`, W/2, 222);
+
+  // Result title
+  ctx.font = 'bold 18px Cinzel, serif';
+  ctx.fillStyle = '#e8c97a';
+  ctx.fillText(title, W/2, 256);
+
+  // Divider line
+  ctx.strokeStyle = 'rgba(201,168,76,0.2)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(W/2 - 80, 270); ctx.lineTo(W/2 + 80, 270);
+  ctx.stroke();
+
+  // Bottom tag
+  ctx.font = '11px Cinzel, serif';
+  ctx.fillStyle = 'rgba(201,168,76,0.4)';
+  ctx.fillText('Think you can do better? Take the quiz ✝', W/2, 304);
+}
+
+function downloadCard() {
+  const canvas = document.getElementById('share-canvas');
+  const link = document.createElement('a');
+  link.download = `easter-quiz-${playerName.toLowerCase().replace(/\s/g,'-')}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function copyShareText() {
+  const total = QUESTIONS.length;
+  const { pct, title } = getResultData(score, total);
+  const text = `✝ Easter Quiz 2025\n${playerName} scored ${score}/${total} (${pct}%) — "${title}"\n\nThink you can beat me? Take the quiz!`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
+}
+</script>
+</body>
+</html>

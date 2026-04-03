@@ -30,6 +30,7 @@ export function QuizExperience({ questions }: QuizExperienceProps) {
   );
   const [revealedAnswer, setRevealedAnswer] = useState<number | null>(null);
   const hasSubmittedRef = useRef(false);
+  const resultCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const currentQuestion = shuffledQuestions[currentIndex];
   const progress = (currentIndex / total) * 100;
@@ -67,6 +68,27 @@ export function QuizExperience({ questions }: QuizExperienceProps) {
       })
       .catch(() => {});
   }, [percentage, playerName, score, screen, selectedAnswers, total]);
+
+  useEffect(() => {
+    if (screen !== "result") {
+      return;
+    }
+
+    const canvas = resultCanvasRef.current;
+
+    if (!canvas) {
+      return;
+    }
+
+    drawResultCard({
+      canvas,
+      playerName,
+      score,
+      total,
+      percentage,
+      title: resultData.title,
+    });
+  }, [percentage, playerName, resultData.title, score, screen, total]);
 
   function startQuiz() {
     const trimmedName = draftName.trim();
@@ -119,6 +141,20 @@ export function QuizExperience({ questions }: QuizExperienceProps) {
     setSelectedAnswers(Array.from({ length: shuffledQuestions.length }, () => -1));
     setRevealedAnswer(null);
     hasSubmittedRef.current = false;
+  }
+
+  function downloadResultCard() {
+    const canvas = resultCanvasRef.current;
+
+    if (!canvas) {
+      return;
+    }
+
+    const link = document.createElement("a");
+    const safeName = playerName.toLowerCase().replace(/\s+/g, "-");
+    link.download = `easter-quiz-${safeName || "result"}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
   }
 
   return (
@@ -321,7 +357,26 @@ export function QuizExperience({ questions }: QuizExperienceProps) {
                 {resultData.message}
               </p>
 
+              <div className="mx-auto mt-8 max-w-2xl rounded-[1.5rem] border border-[rgba(201,168,76,0.16)] bg-[rgba(255,255,255,0.03)] p-4 sm:p-5">
+                <p className="font-[family:var(--font-cinzel)] text-[10px] uppercase tracking-[0.28em] text-[var(--gold-dim)] sm:text-[11px] sm:tracking-[0.35em]">
+                  Download Result Card
+                </p>
+                <canvas
+                  ref={resultCanvasRef}
+                  width={1200}
+                  height={675}
+                  className="mt-4 w-full rounded-[1.25rem] border border-[rgba(201,168,76,0.16)] bg-[var(--dark)] shadow-[0_12px_40px_rgba(0,0,0,0.45)]"
+                />
+              </div>
+
               <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+                <button
+                  type="button"
+                  onClick={downloadResultCard}
+                  className="rounded-full bg-[linear-gradient(135deg,var(--gold)_0%,var(--gold-light)_50%,var(--gold)_100%)] px-6 py-3 font-[family:var(--font-cinzel)] text-sm tracking-[0.25em] text-[var(--dark)] transition hover:-translate-y-0.5"
+                >
+                  DOWNLOAD CARD
+                </button>
                 <button
                   type="button"
                   onClick={playAgain}
@@ -415,4 +470,90 @@ function getResultData(score: number, total: number) {
     message:
       "There is room to grow here. The good news is the story is still waiting for you, and now your attempt can be saved too.",
   };
+}
+
+function drawResultCard({
+  canvas,
+  playerName,
+  score,
+  total,
+  percentage,
+  title,
+}: {
+  canvas: HTMLCanvasElement;
+  playerName: string;
+  score: number;
+  total: number;
+  percentage: number;
+  title: string;
+}) {
+  const context = canvas.getContext("2d");
+
+  if (!context) {
+    return;
+  }
+
+  const width = canvas.width;
+  const height = canvas.height;
+
+  context.clearRect(0, 0, width, height);
+  context.fillStyle = "#1a1208";
+  context.fillRect(0, 0, width, height);
+
+  const glow = context.createRadialGradient(width / 2, 40, 0, width / 2, 40, 420);
+  glow.addColorStop(0, "rgba(201,168,76,0.18)");
+  glow.addColorStop(1, "rgba(201,168,76,0)");
+  context.fillStyle = glow;
+  context.fillRect(0, 0, width, height);
+
+  context.strokeStyle = "rgba(201,168,76,0.08)";
+  context.lineWidth = 1;
+  for (let x = 0; x <= width; x += 60) {
+    context.beginPath();
+    context.moveTo(x, 0);
+    context.lineTo(x, height);
+    context.stroke();
+  }
+  for (let y = 0; y <= height; y += 60) {
+    context.beginPath();
+    context.moveTo(0, y);
+    context.lineTo(width, y);
+    context.stroke();
+  }
+
+  context.strokeStyle = "rgba(201,168,76,0.35)";
+  context.lineWidth = 3;
+  context.strokeRect(40, 40, width - 80, height - 80);
+
+  context.textAlign = "center";
+  context.fillStyle = "#e8c97a";
+  context.font = "700 26px Georgia, serif";
+  context.fillText("EASTER QUIZ 2026", width / 2, 120);
+
+  context.fillStyle = "rgba(245,239,224,0.72)";
+  context.font = "600 34px Georgia, serif";
+  context.fillText(playerName.toUpperCase(), width / 2, 205);
+
+  context.fillStyle = "#c9a84c";
+  context.font = "900 124px Georgia, serif";
+  context.fillText(`${score}/${total}`, width / 2, 380);
+
+  context.fillStyle = "rgba(245,239,224,0.5)";
+  context.font = "600 28px Georgia, serif";
+  context.fillText(`${percentage}% CORRECT`, width / 2, 435);
+
+  context.fillStyle = "#f5efe0";
+  context.font = "700 44px Georgia, serif";
+  context.fillText(title.toUpperCase(), width / 2, 525);
+
+  context.strokeStyle = "rgba(201,168,76,0.24)";
+  context.lineWidth = 2;
+  context.beginPath();
+  context.moveTo(width / 2 - 140, 560);
+  context.lineTo(width / 2 + 140, 560);
+  context.stroke();
+
+  context.fillStyle = "rgba(245,239,224,0.62)";
+  context.font = "500 24px Georgia, serif";
+  context.fillText("How well do you know Jesus?", width / 2, 615);
 }

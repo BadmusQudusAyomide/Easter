@@ -190,7 +190,7 @@ export function QuizExperience({ questions }: QuizExperienceProps) {
               </form>
 
               <p className="mt-5 text-sm italic text-[rgba(245,239,224,0.35)]">
-                Built with love and curiosity, now with saved results.
+                Built with love and curiosity.
               </p>
             </div>
           </section>

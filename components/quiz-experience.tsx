@@ -180,8 +180,9 @@ export function QuizExperience({ questions }: QuizExperienceProps) {
                 Know Jesus?
               </h1>
               <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-[rgba(245,239,224,0.75)] italic sm:text-lg sm:leading-8">
-                You call yourself a Christian, but can you answer these? Twenty
-                questions on the life, death, and resurrection of Jesus Christ.
+                The Easter story is one of the most told in history, but how
+                well do you actually know it? Twenty questions to test your
+                knowledge.
               </p>
 
               <div className="mx-auto mt-8 grid max-w-xl grid-cols-1 gap-3 rounded-[1.25rem] border border-[rgba(201,168,76,0.16)] bg-[rgba(255,255,255,0.03)] px-4 py-5 sm:mt-10 sm:grid-cols-3 sm:gap-4 sm:rounded-[1.5rem] sm:px-8">

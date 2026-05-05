@@ -36,8 +36,8 @@ export default async function AdminPage() {
               Submission Dashboard
             </h1>
             <p className="mt-3 max-w-2xl text-base leading-7 text-[rgba(245,239,224,0.72)]">
-              Review saved attempts from your Next.js quiz here. Once Neon is connected,
-              this page becomes your simple admin view.
+              Review saved attempts from your Next.js  quiz here. Once Neon is connected,
+              this page becomes your simple admin view page
             </p>
           </div>
 
